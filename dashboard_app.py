@@ -34,8 +34,12 @@ def set_data_and_ticker(option):
     
     yesterday=pd.Timestamp(date.today()-timedelta(days=1))
     if df['Date'].max()<yesterday:
-        try:            
-            new_info=get_data(ticker, start_date=str((df['Date'].max()+timedelta(days=1)).strftime("%d/%m/%Y")), end_date=str(datetime.today().strftime("%d/%m/%Y")), index_as_date = True, interval="1d")
+        try:  
+            query_start=(df['Date'].max()+timedelta(days=1)).date()
+            query_end=date.today()       
+            print("------", query_start, query_end,"-----")
+
+            new_info=get_data(ticker, start_date=query_start, end_date=query_end, interval="1d")
             df.set_index('Date',inplace=True)
             df=pd.concat([df,new_info],axis=0)
             df.to_csv(f_name)
@@ -75,8 +79,9 @@ def period_overlay(valid_max_row, valid_max_year, df, most_recent):
     l_date=valid_max_row['start_range'].item()
     u_date=valid_max_row['end_range'].item()
 
-    period_lim_b=valid_max_year-1
-    period_lim_u=valid_max_year+1
+    plot_amp=round(most_recent.shape[0]/252,0)
+    period_lim_b=valid_max_year-plot_amp
+    period_lim_u=valid_max_year+plot_amp+1
 
     df_p=df.reset_index().rename({'index':'Date'},axis=1)
     overlay_df=df_p[df_p['Date'].between(l_date, u_date)]
@@ -283,6 +288,29 @@ if st.button("Execute"):
     html_string = stat_df.to_html(index=True, float_format="{:.2f}".format)
     centered_html_string = f"<div style='text-align: center; padding-left: 100px'>{html_string}</div>"
     st.write(centered_html_string, unsafe_allow_html=True)
+
+    st.write('\n')
+    st.write('\n')
+
+    st.write('*If you would like to:*')
+    list_items = ["Implement advance data analytics in your company"
+                  ,"Learn how to build this tools"
+                  ,"access the underlying data"]
+    list_html = "<ul>" + "".join(["<li>{}</li>".format(item) for item in list_items]) + "</ul>"
+
+    st.write(list_html, unsafe_allow_html=True)
+
+    st.write("Contct me on Linkedin [link] (https://www.linkedin.com/juanraful/)")
+    st.write("\n")
+
+
+    st.write('*Other applications*')
+    list_items = ["Improve forecasting: Find the best period in history to train your forecast model"
+                  ,"Compare companies on different life stages: Compare a company recent financials to the historic financials of a large corporation"
+                  ,"Undestand traffic patterns: find if there are significant patterns in a website traffic data"]
+    list_html = "<ul>" + "".join(["<li>{}</li>".format(item) for item in list_items]) + "</ul>"
+
+    st.write(list_html, unsafe_allow_html=True)
 
 
 
